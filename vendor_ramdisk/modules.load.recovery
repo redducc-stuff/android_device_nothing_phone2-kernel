@@ -215,6 +215,7 @@ qti_cpufreq_cdev.ko
 qti_devfreq_cdev.ko
 btpower.ko
 slimbus.ko
+bt_fm_slim.ko
 qcom-cpufreq-hw-debug.ko
 qcom_lpm.ko
 sdhci-msm.ko
