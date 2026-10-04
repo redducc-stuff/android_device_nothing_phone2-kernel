@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
  */
 
@@ -229,24 +229,35 @@ struct drm_msm_3d_gamut {
 };
 
 #define PGC_TBL_LEN 512
+#define PGC_TBL_LEN_EXTENDED 128
 #define PGC_8B_ROUND (1 << 0)
+#define PGC_HIGHPREC_EN (1 << 1)
 /**
  * struct drm_msm_pgc_lut - pgc lut feature structure
  * @flags: flags for the featue values can be:
  *         - PGC_8B_ROUND
+ *         - PGC_HIGHPREC_EN
  * @c0: color0 component lut
  * @c1: color1 component lut
  * @c2: color2 component lut
+ * @c0_extended: extended color0 component lut
+ * @c1_extended: extended color1 component lut
+ * @c2_extended: extended color2 component lut
  */
 struct drm_msm_pgc_lut {
 	__u64 flags;
 	__u32 c0[PGC_TBL_LEN];
 	__u32 c1[PGC_TBL_LEN];
 	__u32 c2[PGC_TBL_LEN];
+	__u32 c0_extended[PGC_TBL_LEN_EXTENDED];
+	__u32 c1_extended[PGC_TBL_LEN_EXTENDED];
+	__u32 c2_extended[PGC_TBL_LEN_EXTENDED];
 };
 
 #define IGC_TBL_LEN 256
+#define IGC_TBL_LEN_EXTENDED 128
 #define IGC_DITHER_ENABLE (1 << 0)
+#define IGC_HIGH_PREC_ENABLE (1 << 1)
 /**
  * struct drm_msm_igc_lut - igc lut feature structure
  * @flags: flags for the feature customization, values can be:
@@ -259,6 +270,9 @@ struct drm_msm_pgc_lut {
  * @c0_last: color0 lut_last component
  * @c1_last: color1 lut_last component
  * @c2_last: color2 lut_last component
+ * @c0_extended: extended color0 component lut
+ * @c1_extended: extended color1 component lut
+ * @c2_extended: extended color2 component lut
  */
 struct drm_msm_igc_lut {
 	__u64 flags;
@@ -269,6 +283,9 @@ struct drm_msm_igc_lut {
 	__u32 c0_last;
 	__u32 c1_last;
 	__u32 c2_last;
+	__u32 c0_extended[IGC_TBL_LEN_EXTENDED];
+	__u32 c1_extended[IGC_TBL_LEN_EXTENDED];
+	__u32 c2_extended[IGC_TBL_LEN_EXTENDED];
 };
 #define LAST_LUT 2
 
@@ -431,17 +448,34 @@ struct drm_msm_ad4_cfg {
 
 #define DITHER_MATRIX_SZ 16
 #define DITHER_LUMA_MODE (1 << 0)
+#define DITHER_OFFSET_ENABLE (1 << 1)
+
+#define DITHER_MATRIX_SZ_EXTENDED 256
+#define DITHER_MATRIX_SELECT_NONE 0
+#define DITHER_MATRIX_SELECT_4_4 1
+#define DITHER_MATRIX_SELECT_6_6 2
+#define DITHER_MATRIX_SELECT_8_8 3
+#define DITHER_MATRIX_SELECT_16_16 4
 
 /**
  * struct drm_msm_dither - dither feature structure
  * @flags: flags for the feature customization, values can be:
 	   -DITHER_LUMA_MODE: Enable LUMA dither mode
+	   -DITHER_OFFSET_ENABLE: Enable DC offset
  * @temporal_en: temperal dither enable
  * @c0_bitdepth: c0 component bit depth
  * @c1_bitdepth: c1 component bit depth
  * @c2_bitdepth: c2 component bit depth
  * @c3_bitdepth: c2 component bit depth
- * @matrix: dither strength matrix
+ * @matrix: legacy dither strength matrix
+ * @dither_matrix_select: represents dither matrix size
+	   -DITHER_MATRIX_SELECT_NONE: Legacy dither matrix of size 4x4
+	   -DITHER_MATRIX_SELECT_4_4: new dither matrix of size 4x4
+	   -DITHER_MATRIX_SELECT_6_6: new dither matrix of size 6x6
+	   -DITHER_MATRIX_SELECT_8_8: new dither matrix of size 8x8
+	   -DITHER_MATRIX_SELECT_16_16: new dither matrix of size 16x16
+ * @dither_matrix_extended: new dither strength matrix
+ *    -programmed using the ADDRESS and VALUE fields
  */
 struct drm_msm_dither {
 	__u64 flags;
@@ -451,6 +485,9 @@ struct drm_msm_dither {
 	__u32 c2_bitdepth;
 	__u32 c3_bitdepth;
 	__u32 matrix[DITHER_MATRIX_SZ];
+
+	__u32 dither_matrix_select;
+	__s32 dither_matrix_extended[DITHER_MATRIX_SZ_EXTENDED];
 };
 
 /**
@@ -646,6 +683,8 @@ struct drm_msm_spr_udc_cfg {
 #define DEMURA_PRECISION_0 (0 << 2)
 #define DEMURA_PRECISION_1 (1 << 2)
 #define DEMURA_PRECISION_2 (2 << 2)
+#define DEMURA_FLAG_3
+#define DEMURA_FLAG_4
 
 struct drm_msm_dem_cfg {
 	__u64 flags;
@@ -694,6 +733,21 @@ struct drm_msm_dem_cfg {
 	__u32 c2_depth;
 	__u32 src_id;
 	__u32 cfg0_param2_idx;
+
+	__u32 cfg0_param5_len;
+	__u32 cfg0_param5[CFG0_PARAM_LEN];
+	__u32 cfg0_param6_len;
+	__u32 cfg0_param6[CFG0_PARAM_LEN];
+
+	__u32 cfg0_param4_1_len;
+	__u32 cfg0_param4_1[CFG0_PARAM_LEN];
+	__u32 cfg0_param5_1_len;
+	__u32 cfg0_param5_1[CFG0_PARAM_LEN];
+	__u32 cfg0_param6_1_len;
+	__u32 cfg0_param6_1[CFG0_PARAM_LEN];
+
+	__u32 cfg0_param_7;
+	__u32 cfg0_param_8;
 };
 
 struct drm_msm_dem_cfg0_param2 {
@@ -813,5 +867,116 @@ struct drm_msm_misr_sign {
 #define UCSC_CSC_CFG1_PARAM_LEN FP16_CSC_CFG1_PARAM_LEN
 
 typedef struct drm_msm_fp16_csc drm_msm_ucsc_csc;
+
+/* RGB Histogram */
+#define RGB_HISTOGRAM_BIN_COUNT 1024
+#define RGB_HISTOGRAM_BUFFER_SIZE 3
+#define RGB_COMPONENT_SIZE 3
+#define RGB_HIST_GUARD_BYTES 255
+
+#define RGB_HIST_ROI_ENABLE (1 << 0)
+
+#define ROI_MODE_WITHIN 0
+#define ROI_MODE_OUTSIDE 1
+
+#define RGB_HIST_TAP_POINT_AFTER_DSPP 0
+#define RGB_HIST_TAP_POINT_BEFORE_DSPP 1
+
+#define RGB_HIST_COLORMODE_Y 0
+#define RGB_HIST_COLORMODE_V 1
+#define RGB_HIST_COLORMODE_RGB 2
+
+struct drm_msm_rgb_hist_ctrl {
+	__u32 flags;
+	__u32 roi_mode;
+	__u32 roi_x;
+	__u32 roi_y;
+	__u32 roi_width;
+	__u32 roi_height;
+	__u32 tap_point;
+	__u32 colorspace_mode;
+};
+
+/* RGB histogram data per component */
+struct drm_msm_rgb_hist_stats_data {
+	__u32 hist[RGB_HISTOGRAM_BIN_COUNT];
+	__u32 hist_min;
+	__u32 hist_max;
+	__u32 hist_sum_lsb;
+	__u32 hist_sum_msb;
+	__u32 hcount;
+	__u32 crc;
+	__u32 status_flags;
+	__u32 roi_mode;
+	__u32 roi_x;
+	__u32 roi_y;
+	__u32 roi_width;
+	__u32 roi_height;
+	__u32 tap_point;
+	__u32 colorspace_mode;
+};
+
+struct drm_msm_rgb_hist_buffers_ctrl {
+	__u32 fds[RGB_HISTOGRAM_BUFFER_SIZE][RGB_COMPONENT_SIZE];
+};
+
+struct drm_msm_rgb_hist_buffer {
+	__u32 fd[RGB_COMPONENT_SIZE];
+	__u32 offset[RGB_COMPONENT_SIZE];
+	__u32 status;
+};
+
+#define QRTC_LUT_SIZE 81          /* Each LUT is 9x9 */
+#define QRTC_NUM_LUTS 3           /* Number of LPF/HPF tables */
+
+/* Subsample Mode Definitions */
+#define QRTC_SUBSAMPLE_1x1 0x0    /* Horizontal: 1, Vertical: 1 */
+#define QRTC_SUBSAMPLE_2x1 0x1    /* Horizontal: 2, Vertical: 1 */
+#define QRTC_SUBSAMPLE_2x2 0x2    /* Horizontal: 2, Vertical: 2 */
+#define QRTC_SUBSAMPLE_3x3 0x3    /* Horizontal: 3, Vertical: 3 */
+
+/* DMA Selection Definitions */
+#define QRTC_DMA_1 0x1
+#define QRTC_DMA_3 0x3
+
+/* Rectangle Selection Definitions */
+#define QRTC_RECT0 0x0            /* Select Rectangle-0 */
+#define QRTC_RECT1 0x1            /* Select Rectangle-1 */
+
+#define WRITE_BACK_0 0x0
+#define WRITE_BACK_1 0x1
+#define WRITE_BACK_2 0x2
+
+struct drm_msm_qrtc_buffer {
+	__u32 fd;
+	__u32 width;
+	__u32 height;
+	__u32 format;
+	__u32 aligned_height;
+	__u32 aligned_width;
+};
+
+struct drm_msm_qrtc_config {
+	__u32 flags;
+	__u32 lpf[QRTC_NUM_LUTS][QRTC_LUT_SIZE];    /* LPF LUTs */
+	__u32 hpf[QRTC_NUM_LUTS][QRTC_LUT_SIZE];    /* HPF LUTs */
+
+	/* Global coring parameters in U10 format (0–1023) */
+	__u32 coring_en;  /* Positive coring value */
+	__u32 coring_pos; /* Positive coring value */
+	__u32 coring_neg; /* Negative coring value */
+
+	/* Global control flags */
+	__u32 lpf_en;              /* Enable/disable LPF (0 = disable, 1 = enable) */
+	__u32 subsample_mode;      /* Subsampling mode (use QRTC_SUBSAMPLE_* macros) */
+	__u32 dma_sel;             /* DMA selection (use QRTC_DMA_* macros) */
+	__u32 rect_sel;            /* Rectangle selection (use QRTC_RECT0 or QRTC_RECT1) */
+	__u32 wb_sel;
+
+	__u32 cwb_height;
+	__u32 cwb_width;
+	__u32 aligned_cwb_height;
+	__u32 aligned_cwb_width;
+};
 
 #endif /* _MSM_DRM_PP_H_ */

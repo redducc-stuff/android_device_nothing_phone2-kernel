@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (c) 2021-2022,2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
  */
 
@@ -78,6 +78,71 @@ extern "C" {
 #define DRM_FORMAT_MOD_QCOM_CAC_B          fourcc_mod_code(QCOM, 0x100)
 
 /**
+ * @DRM_FORMAT_MOD_QCOM_LOSSY_8_5:	Refers to RGBA888 UBWC pixel format with 1.26x
+ *					compression ratio.
+ */
+#define DRM_FORMAT_MOD_QCOM_LOSSY_8_5	fourcc_mod_code(QCOM, 0x20)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_LOSSY_2_1:	Refers to RGBA8888 UBWC pixel format with 2x
+ *					compression ratio.
+ */
+#define DRM_FORMAT_MOD_QCOM_LOSSY_2_1	fourcc_mod_code(QCOM, 0x200)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_DMA:       Refers to a DMA variant of the base format.
+ *                                  Implementation may be platform and
+ *                                  base-format specific.
+ */
+#define DRM_FORMAT_MOD_QCOM_DMA	fourcc_mod_code(QCOM, 0x400)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_FSC_TILE:	Refers to a tile variant of the
+ *					planar format. Implementation may be
+ *					platform and base-format specific.
+ */
+#define DRM_FORMAT_MOD_QCOM_FSC_TILE	fourcc_mod_code(QCOM, 0x800)
+
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_FSC_4R_TILE:	Refers to a tile variant of the
+ *					planar format. Implementation may be
+ *					platform and base-format specific.
+ */
+#define DRM_FORMAT_MOD_QCOM_FSC_4R_TILE	fourcc_mod_code(QCOM, 0x1000)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_FSC_ALPHA:	Refers to a alpha variant of the
+ *					planar format. Implementation may be
+ *					platform and base-format specific.
+ */
+#define DRM_FORMAT_MOD_QCOM_FSC_ALPHA	fourcc_mod_code(QCOM, 0x2000)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_NV12_4R_Y_4:	Refers to a RGBA variant of the
+ *					stitched NV12_4R(Y only) layers as
+ *					planar format. Implementation may be
+ *					platform and base-format specific.
+ */
+#define DRM_FORMAT_MOD_QCOM_NV12_4R_4Y	fourcc_mod_code(QCOM, 0x4000)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_ALPHA_ONLY : Refers to a single-plane RGB format that
+ *					only contains 'alpha' content
+ */
+#define DRM_FORMAT_MOD_QCOM_ALPHA_ONLY	fourcc_mod_code(QCOM, 0x8000)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_LUMA_ONLY : Refers to a single-plane YUV format that
+ *					only contains 'luma' content
+ */
+#define DRM_FORMAT_MOD_QCOM_LUMA_ONLY	fourcc_mod_code(QCOM, 0x10000)
+
+/**
+ * @DRM_FORMAT_MOD_QCOM_MSB_ALIGN : Refers to a MSB aligned format
+ */
+#define DRM_FORMAT_MOD_QCOM_MSB_ALIGN	fourcc_mod_code(QCOM, 0x20000)
+/**
  * Blend operations for "blend_op" property
  *
  * @SDE_DRM_BLEND_OP_NOT_DEFINED:   No blend operation defined for the layer.
@@ -154,6 +219,15 @@ extern "C" {
  */
 #define SDE_DRM_SEC_NON_SEC            0
 #define SDE_DRM_SEC_ONLY               1
+
+/**
+ * WB panel modes for "wb_panel_type" Connector property.
+ *                        Connector property used to identify the type of LSR display panel.
+ * @ SDE_DRM_WB_PANEL_TYPE_RGB: RGB panel.
+ * @ SDE_DRM_WB_PANEL_TYPE_FSD: FSD panel.
+ */
+#define SDE_DRM_WB_PANEL_TYPE_RGB            0
+#define SDE_DRM_WB_PANEL_TYPE_FSD            1
 
 /**
  * struct sde_drm_pix_ext_v1 - version 1 of pixel ext structure
@@ -281,6 +355,11 @@ struct sde_drm_de_v1 {
  * @cac_le_inc_skip_y:     LE vertical inc_skip control
  * @cac_re_inc_skip_x:     RE horizontal inc_skip control
  * @cac_re_inc_skip_y:     RE vertical inc_skip control
+ * @fov_mode:              Fovea mode for current configuration
+ * @cac_asym_phase_step_h: Horizontal phase step for fov mode after center region
+ * @cac_asym_phase_step_v: Vertical phase step for fov mode after center region
+ * @cac_re_phase_step_v:   Right eye vertical phase step for fov mode in beginning region
+ * @cac_re_asym_phase_step_v: Right eye vertical phase step for fov mode in ending region
  */
 struct sde_drm_cac {
 	__u32 cac_mode;
@@ -308,6 +387,12 @@ struct sde_drm_cac {
 	__u16 cac_le_inc_skip_y[SDE_MAX_PLANES];
 	__u16 cac_re_inc_skip_x[SDE_MAX_PLANES];
 	__u16 cac_re_inc_skip_y[SDE_MAX_PLANES];
+
+	__u32 fov_mode;
+	__u32 cac_asym_phase_step_h;
+	__u32 cac_asym_phase_step_v;
+	__u32 cac_re_phase_step_v;
+	__u32 cac_re_asym_phase_step_v;
 };
 
 /*
@@ -324,6 +409,7 @@ struct sde_drm_cac {
 #define SDE_DRM_QSEED4
 #define SDE_DRM_INLINE_PREDOWNSCALE
 #define SDE_DRM_QSEED6
+#define SDE_DRM_QSEED7
 
 /**
  * struct sde_drm_scaler_v2 - version 2 of struct sde_drm_scaler
@@ -368,6 +454,14 @@ struct sde_drm_cac {
  * @dir45_en:          45/-45 degree direction filtering enable
  * @cor_en:            corner enhancer enable
  * @cac_cfg:           CAC QSEED config
+ * @edge_bleed_sup_en: Enable edge bleed supression
+ * @adaptive_de_en:    Enable adaptive DE
+ * @polarity_en:       Enable polarity check
+ * @strength_slope:    Slope(m) in y=mx+c, DG calculation
+ * @strength_const:    Constant(c) in y=mx+c, DG calculation
+ * @strength_coeff_tl: Low threshold for Dynamic gain(DG)
+ * @strength_coeff_th: High threshold for Dynamic gain(DG)
+ * @halo_suppress_coeff: Halo Suppress Multiplier
  */
 struct sde_drm_scaler_v2 {
 	/*
@@ -442,6 +536,15 @@ struct sde_drm_scaler_v2 {
 	__u32 cor_en;
 
 	struct sde_drm_cac cac_cfg;
+	__u32 edge_bleed_sup_en;
+	__u32 adaptive_de_en;
+	__u32 polarity_en;
+
+	__u32 strength_slope;
+	__u32 strength_const;
+	__u32 strength_coeff_tl;
+	__u32 strength_coeff_th;
+	__u32 halo_suppress_coeff;
 };
 
 /* Number of dest scalers supported */
@@ -455,6 +558,13 @@ struct sde_drm_scaler_v2 {
 #define SDE_DRM_DESTSCALER_ENHANCER_UPDATE  0x4
 #define SDE_DRM_DESTSCALER_PU_ENABLE        0x8
 
+/*
+ * Possible merge_mode values for each Destination Scaler block
+ */
+#define DEST_SCALER_SINGLE_PIPE   1
+#define DEST_SCALER_DUAL_PIPE     2
+#define DEST_SCALER_QUAD_PIPE     3
+
 /**
  * struct sde_drm_dest_scaler_cfg - destination scaler config structure
  * @flags:      Flag to switch between mode for destination scaler
@@ -464,6 +574,7 @@ struct sde_drm_scaler_v2 {
  * @lm_height:  Layer mixer height configuration
  * @scaler_cfg: The scaling parameters for all the mode except disable
  *              Userspace pointer to struct sde_drm_scaler_v2
+ * @merge_mode: Specify pipe merge mode for each DS block
  */
 struct sde_drm_dest_scaler_cfg {
 	__u32 flags;
@@ -471,6 +582,7 @@ struct sde_drm_dest_scaler_cfg {
 	__u32 lm_width;
 	__u32 lm_height;
 	__u64 scaler_cfg;
+	__u32 merge_mode;
 };
 
 /**
@@ -577,15 +689,22 @@ struct sde_drm_wb_cfg {
 };
 
 #define SDE_MAX_ROI_V1	4
+#define SDE_DRM_SPR_ROI	1
+/* DRM_ROI_CONFIG_FLAGS */
+#define SDE_DRM_ROI_SPR_FLAG_EN	(1 << 0)
 
 /**
  * struct sde_drm_roi_v1 - list of regions of interest for a drm object
  * @num_rects: number of valid rectangles in the roi array
  * @roi: list of roi rectangles
+ * @roi_feature_flags: flags indicates that specific roi rect is valid or not
+ * @spr_roi: list of roi rectangles for spr
  */
 struct sde_drm_roi_v1 {
 	__u32 num_rects;
 	struct drm_clip_rect roi[SDE_MAX_ROI_V1];
+	__u32 roi_feature_flags;
+	struct drm_clip_rect spr_roi[SDE_MAX_ROI_V1];
 };
 
 /**
@@ -604,6 +723,12 @@ struct sde_drm_roi_v1 {
 #define SDE_RECOVERY_SUCCESS		0
 #define SDE_RECOVERY_CAPTURE		1
 #define SDE_RECOVERY_HARD_RESET		2
+
+/**
+ * sde SSR events for notifying client
+ */
+#define SDE_SSR_START                   0
+#define SDE_SSR_END                     1
 
 /**
  * Define UBWC statistics config
@@ -850,6 +975,20 @@ struct drm_msm_display_hint {
 	__u32 hint_flags;
 };
 
+/**
+ * struct drm_msm_display_early_ept: Payload for display early ept hint
+ * @ept:  Expected present time value in nano seconds.
+ * @frame_interval: Frame interval in nano seconds of vrr.
+ * @connector_id: connector id.
+ * @flags:  operation control flags, for future use
+ */
+struct drm_msm_display_early_ept {
+	__u64 ept_ns;
+	__u64 frame_interval;
+	__u32 connector_id;
+	__u32 flags;
+};
+
 #define DRM_NOISE_LAYER_CFG
 #define DRM_NOISE_TEMPORAL_FLAG (1 << 0)
 #define DRM_NOISE_ATTN_MAX 255
@@ -860,9 +999,11 @@ struct drm_msm_display_hint {
  * @flags: operation control flags, for future use
  * @zposn: noise zorder
  * @zposattn: attenuation zorder
- * @attn_factor: attenuation factor in range of 1 to 255
+ * @attn_factor: attenuation factor in range of 1 to 255 for 8 bit and
+ *               1 to 65535 for 10 bit alpha
  * @stength: strength in range of 0 to 6
- * @alpha_noise: attenuation in range of 1 to 255
+ * @alpha_noise: attenuation in range of 1 to 255 for 8 bit and
+ *               1 to 65535 for 10 bit alpha
 */
 struct drm_msm_noise_layer_cfg {
 	__u64 flags;
@@ -962,12 +1103,90 @@ struct sde_drm_dnsc_blur_cfg {
 	__u32 dither_matrix[DNSC_BLUR_DITHER_MATRIX_SZ];
 };
 
+/**
+ * struct drm_msm_opaque_config - Opaque configuration
+ * @size: Size of the payload.
+ * @data: opaque data from the client.
+ * @flags: Flags to indicate features enabled.
+ * @crc: CRC for data validation.
+ */
+struct drm_msm_opaque_config {
+	__u64 size;
+	__u64 flags;
+	__u32 crc;
+	__u64 data;
+};
+
+/* Max privacy layers */
+#define MAX_PRIVACY_LAYERS 16
+
+#define PRIVACY_LAYERS_AREA_MODE 1
+
+/**
+ * struct sde_privacy - Defines a rectangular privacy region with optional corner radius
+ * @corner_radius: Radius for rounded corners of the privacy region
+ * @left: Left coordinate of the privacy region
+ * @top: Top coordinate of the privacy region
+ * @right: Right coordinate of the privacy region
+ * @bottom: Bottom coordinate of the privacy region
+ **/
+struct sde_privacy {
+	__u32 corner_radius;
+	__u32 left;
+	__u32 top;
+	__u32 right;
+	__u32 bottom;
+};
+
+/**
+ * struct sde_privacy_v2 - Defines a rectangular privacy region with optional corner radius
+ * @corner_radius: Radius for rounded corners of the privacy region
+ * @left: Left coordinate of the privacy region
+ * @top: Top coordinate of the privacy region
+ * @right: Right coordinate of the privacy region
+ * @bottom: Bottom coordinate of the privacy region
+ * @index: Index specifies which privacy area mode this rect corresponds to
+ **/
+struct sde_privacy_v2 {
+	__u32 corner_radius;
+	__u32 left;
+	__u32 top;
+	__u32 right;
+	__u32 bottom;
+	__u32 index;
+};
+
+/**
+ * struct sde_drm_privacy_layer_v1 - Defines root structure to hold all privacy layer info.
+ * @no_of_layers: Number of active privacy layers in use
+ * @reserved: Reserved for future use or alignment
+ * @privacy_list: Array of privacy layer configurations, up to MAX_PRIVACY_LAYERS
+ **/
+struct sde_drm_privacy_layer_v1 {
+	__u32 no_of_layers;
+	__u32 reserved;
+	struct sde_privacy privacy_list[MAX_PRIVACY_LAYERS];
+};
+
+/**
+ * struct sde_drm_privacy_layer_v2 - Defines root structure to hold all privacy layer info.
+ * @no_of_layers: Number of active privacy layers in use
+ * @mode: Privacy layer/area mode
+ * @privacy_list: Array of privacy layer configurations, up to MAX_PRIVACY_LAYERS
+ **/
+struct sde_drm_privacy_layer_v2 {
+	__u32 no_of_layers;
+	__u32 mode;
+	struct sde_privacy_v2 privacy_list[MAX_PRIVACY_LAYERS];
+};
+
 #define DRM_SDE_WB_CONFIG              0x40
 #define DRM_MSM_REGISTER_EVENT         0x41
 #define DRM_MSM_DEREGISTER_EVENT       0x42
 #define DRM_MSM_RMFB2                  0x43
 #define DRM_MSM_POWER_CTRL             0x44
 #define DRM_MSM_DISPLAY_HINT           0x45
+#define DRM_MSM_EARLY_EPT              0x46
 
 /* sde custom events */
 #define DRM_EVENT_HISTOGRAM 0x80000000
@@ -987,12 +1206,28 @@ struct sde_drm_dnsc_blur_cfg {
 #define DRM_EVENT_VM_RELEASE 0X8000000E
 #define DRM_EVENT_OPR_VALUE 0X8000000F
 #define DRM_EVENT_MISR_SIGN 0X80000010
+#define DRM_EVENT_FRAME_DONE 0X8000011
+#define DRM_EVENT_MDNIE_ART 0X80000012
+#define DRM_EVENT_COPR 0X80000013
+#define DRM_EVENT_VM_RECLAIM 0X80000014
+#define DRM_EVENT_SSR 0X80000015
+#define DRM_EVENT_RGB_HIST 0X80000016
+#define DRM_EVENT_RGB_HIST_WB_ERR 0X80000017
+#define DRM_EVENT_RGB_HIST_OFF 0X80000018
+#define DRM_EVENT_LSR_SSR 0X80000019
 
 #ifndef DRM_MODE_FLAG_VID_MODE_PANEL
 #define DRM_MODE_FLAG_VID_MODE_PANEL        0x01
 #endif
 #ifndef DRM_MODE_FLAG_CMD_MODE_PANEL
 #define DRM_MODE_FLAG_CMD_MODE_PANEL        0x02
+#endif
+
+#ifndef DRM_MODE_FLAG_DSI_24BPP
+#define DRM_MODE_FLAG_DSI_24BPP             0x01
+#endif
+#ifndef DRM_MODE_FLAG_DSI_30BPP
+#define DRM_MODE_FLAG_DSI_30BPP             0x02
 #endif
 
 /* display hint flags*/
@@ -1002,6 +1237,178 @@ struct sde_drm_dnsc_blur_cfg {
 #define DRM_MSM_DISPLAY_MODE_CHANGE_HINT          0x08
 
 #define DRM_MSM_WAKE_UP_ALL_DISPLAYS        0xFFFFFFFF
+
+/* Reprojection flags*/
+#define MAX_VIEWS 2
+#define MAX_BUFFERS_PER_VIEW 8
+
+#define SDE_VISIBILITY_LEFT 0
+#define SDE_VISIBILITY_RIGHT 1
+
+/**
+ * struct sde_drm_view_descriptor - View descriptor structure
+ * @view_index: View index.
+ * @num_fbs: Number of FBs per view.
+ * @fb_id: Array of FB IDs.
+ */
+struct sde_drm_view_descriptor {
+	__u32 view_index;
+	__u32 num_fbs;
+	__u32 fb_id[MAX_BUFFERS_PER_VIEW];
+};
+
+/**
+ * struct sde_drm_fb_id_list - FB ID list structure
+ * @views: - Array of view descriptors for front view.
+ * @back_views: Array of view descriptors for back view.
+ */
+struct sde_drm_fb_id_list {
+	struct sde_drm_view_descriptor views[MAX_VIEWS];
+	struct sde_drm_view_descriptor back_views[MAX_VIEWS];
+};
+
+/**
+ * struct sde_drm_point - Point structure
+ * @x: x.
+ * @y: y.
+ */
+struct sde_drm_point {
+	__u32 x;
+	__u32 y;
+};
+
+/**
+ * struct sde_drm_lsr_point - LSR Point structure
+ * @points: Array of Points.
+ */
+struct sde_drm_lsr_point {
+	struct sde_drm_point points[MAX_VIEWS];
+};
+
+#define REPROJ_MATRIX_ROWS 4
+#define REPROJ_MATRIX_COLS 4
+
+/**
+ * struct sde_drm_reproj_matrix - Reprojection structure
+ * @view_index: View index.
+ * @is_inverse: Indicates if it is inverse.
+ * @reproj_matrix: 2D array of reproj matrix.
+ */
+struct sde_drm_reproj_matrix {
+	__u32 view_index;
+	__u32 is_inverse;
+	__u32 reproj_matrix[REPROJ_MATRIX_ROWS][REPROJ_MATRIX_COLS];
+};
+
+/**
+ * struct sde_drm_reproj_matrix_list - Reproj Matrix List structure
+ * @matrix_list: Array of Reproj matrices.
+ */
+struct sde_drm_reproj_matrix_list {
+	struct sde_drm_reproj_matrix matrix_list[MAX_VIEWS * 2];
+};
+
+ /**
+  * enum sde_drm_lsr_layer_type - App local/remote layer type hint
+  * @SDE_LSR_LAYER_LOCAL: Local layer.
+  * @SDE_LSR_LAYER_REMOTE: Remote layer.
+  */
+enum sde_drm_lsr_layer_type {
+	SDE_LSR_LAYER_LOCAL = 0,
+	SDE_LSR_LAYER_REMOTE
+};
+
+/**
+ * enum sde_drm_lsr_layer_lock_type - App layer lock type
+ * @SDE_LSR_LAYER_LOCK_WORLD_LOCK  : World locked layer.
+ * @SDE_LSR_LAYER_LOCK_HEAD_LOCK   : Head locked layer.
+ * @SDE_LSR_LAYER_LOCK_SPHERE_LOCK : Sphere locked layer.
+ */
+enum sde_drm_lsr_layer_lock_type {
+	SDE_LSR_LAYER_LOCK_WORLD_LOCK = 0,
+	SDE_LSR_LAYER_LOCK_HEAD_LOCK,
+	SDE_LSR_LAYER_LOCK_SPHERE_LOCK
+};
+
+/*
+ * enum sde_drm_layer_gamma_type - Layer Gamma type
+ * @SDE_LAYER_GAMMA_NONE     : None
+ * @SDE_LAYER_GAMMA_1_0      : 1.0
+ * @SDE_LAYER_GAMMA_2_2      : 2.2
+ * @SDE_LAYER_GAMMA_2_6      : 2.6
+ * @SDE_LAYER_GAMMA_REC_601  : Rec. 601
+ * @SDE_LAYER_GAMMA_REC_709  : Rec. 709
+ * @SDE_LAYER_GAMMA_REC_SRGB : SRGB
+ */
+enum sde_drm_layer_gamma_type {
+	SDE_LAYER_GAMMA_NONE = 0,
+	SDE_LAYER_GAMMA_1_0,
+	SDE_LAYER_GAMMA_2_2,
+	SDE_LAYER_GAMMA_2_6,
+	SDE_LAYER_GAMMA_REC_601,
+	SDE_LAYER_GAMMA_REC_709,
+	SDE_LAYER_GAMMA_REC_SRGB
+};
+
+/**
+ * struct sde_drm_plane_equation - Plane equation structure
+ * @a: a.
+ * @b: b.
+ * @c: c
+ * @d: d.
+ */
+struct sde_drm_plane_equation {
+	__u32 a;
+	__u32 b;
+	__u32 c;
+	__u32 d;
+};
+
+/**
+ * struct sde_drm_render_pose - Render Pose structure
+ * @x_position: x_position.
+ * @y_position: y_position.
+ * @z_position: z_position.
+ * @x_orientation: x_orientation.
+ * @y_orientation: y_orientation.
+ * @z_orientation: z_orientation.
+ * @w_orientation: w_orientation.
+ */
+struct sde_drm_render_pose {
+	__u32 x_position;
+	__u32 y_position;
+	__u32 z_position;
+	__u32 x_orientation;
+	__u32 y_orientation;
+	__u32 z_orientation;
+	__u32 w_orientation;
+};
+
+/**
+ * struct sde_drm_render_frustum - Render Frustum structure
+ * @angle_left: Left angle.
+ * @angle_right: Right angle.
+ * @angle_up: Up angle.
+ * @angle_down: Down angle.
+ */
+struct sde_drm_render_frustum {
+	__u32 angle_left;
+	__u32 angle_right;
+	__u32 angle_up;
+	__u32 angle_down;
+};
+
+/**
+ * enum sde_drm_wb_functional_mode - WB Functional modes
+ * @SDE_LSR_WB_RENDER_MODE - Render mode.
+ * @SDE_LSR_WB_REPROJECTION_MODE - Reprojection mode.
+ * @SDE_LSR_WB_FUNCTIONAL_MODE_MAX - Used to track max possible modes.
+ */
+enum sde_drm_wb_functional_mode {
+	SDE_LSR_WB_RENDER_MODE = 0,
+	SDE_LSR_WB_REPROJECTION_MODE,
+	SDE_LSR_WB_FUNCTIONAL_MODE_MAX,
+};
 
 #define DRM_IOCTL_SDE_WB_CONFIG \
 	DRM_IOW((DRM_COMMAND_BASE + DRM_SDE_WB_CONFIG), struct sde_drm_wb_cfg)
@@ -1015,6 +1422,8 @@ struct sde_drm_dnsc_blur_cfg {
 			DRM_MSM_POWER_CTRL), struct drm_msm_power_ctrl)
 #define DRM_IOCTL_MSM_DISPLAY_HINT DRM_IOW((DRM_COMMAND_BASE + \
 			DRM_MSM_DISPLAY_HINT), struct drm_msm_display_hint)
+#define DRM_IOCTL_MSM_EARLY_EPT DRM_IOW((DRM_COMMAND_BASE + \
+			DRM_MSM_EARLY_EPT), struct drm_msm_display_early_ept)
 
 #if defined(__cplusplus)
 }
