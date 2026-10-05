@@ -342,6 +342,7 @@ spi-geni-qcom.ko
 spmi-pmic-err-debug.ko
 stm_heartbeat.ko
 thermal_config.ko
+thermal-generic-adc.ko
 tornado_mod.ko
 videocc-diwali.ko
 wcd9378_dlkm.ko
