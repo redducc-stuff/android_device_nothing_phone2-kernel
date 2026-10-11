@@ -273,12 +273,10 @@ cpu_mpam.ko
 cpucp_fast.ko
 cpuss_telemetry.ko
 dispcc-diwali.ko
-dispcc-waipio.ko
 gh_vcpu_mgr.ko
 gh_panic_notifier.ko
 dmesg_dumper.ko
 gcc-fillmore.ko
-gcc-waipio.ko
 gh_rm_booster.ko
 gh_tlmm_vm_mem_access.ko
 gic_intr_routing.ko
@@ -351,3 +349,5 @@ wcd9378_slave_dlkm.ko
 wcd937x_slave_dlkm.ko
 wsa881x_analog_dlkm.ko
 wsa884x_dlkm.ko
+dispcc-waipio.ko
+gcc-waipio.ko
